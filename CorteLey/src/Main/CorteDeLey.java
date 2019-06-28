@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -17,8 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.JCheckBox;
 import javax.swing.JTextPane;
 import javax.swing.JButton;
+import javax.swing.JScrollPane;
 
-public class CorteLey extends JFrame implements ActionListener{
+public class CorteDeLey extends JFrame implements ActionListener{
 
 	private JPanel contentPane;
 	private JTextField txtContratoPartUno;
@@ -34,8 +36,9 @@ public class CorteLey extends JFrame implements ActionListener{
 	private JLabel lblCuotasFraccionada;
 	private JLabel lblPrk;
 	private JLabel lblPri;
-	private JTextPane txtResultado;
+	private JTextArea txtResultado;
 	private JButton btnOk;
+	private JScrollPane scrollPane;
 	/**
 	 * Launch the application.
 	 */
@@ -43,7 +46,7 @@ public class CorteLey extends JFrame implements ActionListener{
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					CorteLey frame = new CorteLey();
+					CorteDeLey frame = new CorteDeLey();
 					frame.setResizable(false);
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -56,9 +59,9 @@ public class CorteLey extends JFrame implements ActionListener{
 	/**
 	 * Create the frame.
 	 */
-	public CorteLey() {
+	public CorteDeLey() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 500);
+		setBounds(100, 100, 700, 800);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.WHITE);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -155,35 +158,30 @@ public class CorteLey extends JFrame implements ActionListener{
 		txtPrk1 = new JTextField();
 		txtPrk1.setFont(new Font("Arial", Font.PLAIN, 16));
 		txtPrk1.setColumns(10);
-		txtPrk1.setBounds(327, 152, 41, 26);
+		txtPrk1.setBounds(327, 152, 89, 26);
 		txtPrk1.setVisible(false);
 		contentPane.add(txtPrk1);
 		
 		txtPrk2 = new JTextField();
 		txtPrk2.setFont(new Font("Arial", Font.PLAIN, 16));
 		txtPrk2.setColumns(10);
-		txtPrk2.setBounds(327, 191, 41, 26);
+		txtPrk2.setBounds(327, 191, 89, 26);
 		txtPrk2.setVisible(false);
 		contentPane.add(txtPrk2);
 		
 		txtPri1 = new JTextField();
 		txtPri1.setFont(new Font("Arial", Font.PLAIN, 16));
 		txtPri1.setColumns(10);
-		txtPri1.setBounds(479, 152, 41, 26);
+		txtPri1.setBounds(468, 150, 83, 26);
 		txtPri1.setVisible(false);
 		contentPane.add(txtPri1);
 		
 		txtPri2 = new JTextField();
 		txtPri2.setFont(new Font("Arial", Font.PLAIN, 16));
 		txtPri2.setColumns(10);
-		txtPri2.setBounds(479, 193, 41, 26);
+		txtPri2.setBounds(468, 195, 83, 26);
 		txtPri2.setVisible(false);
 		contentPane.add(txtPri2);
-		
-		txtResultado = new JTextPane();
-		txtResultado.setBackground(Color.LIGHT_GRAY);
-		txtResultado.setBounds(24, 245, 639, 195);
-		contentPane.add(txtResultado);
 		
 		JLabel label = new JLabel("-------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 		label.setBounds(15, 129, 655, 16);
@@ -194,6 +192,14 @@ public class CorteLey extends JFrame implements ActionListener{
 		btnOk.setFont(new Font("Arial Black", Font.BOLD, 26));
 		btnOk.setBounds(557, 148, 97, 73);
 		contentPane.add(btnOk);
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(15, 231, 663, 513);
+		contentPane.add(scrollPane);
+		
+		txtResultado = new JTextArea();
+		scrollPane.setViewportView(txtResultado);
+		txtResultado.setBackground(Color.LIGHT_GRAY);
 		
 		this.cbxFraccionada.addActionListener(this);
 		this.btnOk.addActionListener(this);
@@ -227,7 +233,78 @@ public class CorteLey extends JFrame implements ActionListener{
 		}
 		
 		if(e.getSource() == this.btnOk) {
-			this.txtResultado.setText("Aqui va el resultado");
+			int cuotaInicio = Integer.parseInt(this.txtCuotaUno.getText());
+			int cuotaFin = Integer.parseInt(this.txtCuotaDos.getText());
+			String cuotas = "(";
+			for (int i = cuotaInicio; i <= cuotaFin; i++) {
+				if(i == cuotaFin) {
+					cuotas += ""+i;
+				}else {
+					cuotas += ""+i+", ";
+				}
+				
+			}
+			cuotas += ")";
+			
+			this.txtResultado.setText("");
+			this.txtResultado.append("UPDATE cfcprd/prktbl SET PRKEST = 10\n");
+			this.txtResultado.append("WHERE srvcdg="+this.txtContratoPartUno.getText()+" AND srvcns="+this.txtContratoPartDos.getText()+" AND prkcta IN "+cuotas+"\n");
+			this.txtResultado.append("AND PRKEST = 0\n");
+			this.txtResultado.append("\n");
+			
+			this.txtResultado.append("UPDATE cfcprd/pritbl SET PRIEST = 10\n");
+			this.txtResultado.append("WHERE srvcdg="+this.txtContratoPartUno.getText()+" AND srvcns="+this.txtContratoPartDos.getText()+" AND pricta IN "+cuotas+"\n");
+			this.txtResultado.append("AND PRIEST = 0\n");
+			this.txtResultado.append("\n");
+			
+			this.txtResultado.append("UPDATE cfcprd/prutbl SET PRUEST = 10\n");
+			this.txtResultado.append("WHERE srvcdg="+this.txtContratoPartUno.getText()+" AND srvcns="+this.txtContratoPartDos.getText()+" AND pructa IN "+cuotas+"\n");
+			this.txtResultado.append("AND PRUEST = 0\n");
+			this.txtResultado.append("\n");
+			
+			if(this.cbxFraccionada.isSelected()) {
+				this.txtResultado.append("-- PRK FRACCIONADA\n");
+				this.txtResultado.append("UPDATE CFCPRD/PRKTBL SET PRKEST = 2\n");
+				this.txtResultado.append("WHERE SRVCDG = "+this.txtContratoPartUno.getText()+" AND SRVCNS = "+this.txtContratoPartDos.getText()+" AND PRKEST = 0\n");
+				this.txtResultado.append("AND PRKCTA = "+this.txtCuotaFraccionada.getText()+" AND PRKFRC = 0\n");
+				this.txtResultado.append("\n");
+				
+				this.txtResultado.append("INSERT INTO CFCPRD/PRKTBL\n");
+				this.txtResultado.append("SELECT SRVCDG, SRVCNS, PRKCTA, 1, PRKFPA, PRKFPM, PRKFPD,\n");
+				this.txtResultado.append("PRKFHA, PRKFHM, PRKFHD, PRKFAA, PRKFAM, PRKFAD,  "+this.txtPrk1.getText()+", PRKVLP,\n");
+				this.txtResultado.append("PRKSPG, PRKSLD, PRKTPG, 10 FROM CFCPRD/PRKTBL WHERE SRVCDG="+this.txtContratoPartUno.getText()+" \n");
+				this.txtResultado.append("AND SRVCNS="+this.txtContratoPartDos.getText()+" AND PRKCTA="+this.txtCuotaFraccionada.getText()+"\n");
+				this.txtResultado.append("\n");
+				
+				this.txtResultado.append("INSERT INTO CFCPRD/PRKTBL\n");
+				this.txtResultado.append("SELECT SRVCDG, SRVCNS, PRKCTA, 2, PRKFPA, PRKFPM, PRKFPD,\n");
+				this.txtResultado.append("PRKFHA, PRKFHM, PRKFHD, PRKFAA, PRKFAM, PRKFAD, "+this.txtPrk2.getText()+", PRKVLP,\n");
+				this.txtResultado.append("PRKSPG, PRKSLD, PRKTPG, 0 FROM CFCPRD/PRKTBL WHERE SRVCDG="+this.txtContratoPartUno.getText()+" \n");
+				this.txtResultado.append("AND SRVCNS="+this.txtContratoPartDos.getText()+" AND PRKCTA="+this.txtCuotaFraccionada.getText()+" AND PRKFRC=0\n");
+				this.txtResultado.append("\n");
+				
+				this.txtResultado.append("-- PRI FRACCIONADA\n");
+				this.txtResultado.append("UPDATE CFCPRD/PRITBL SET PRIEST = 2\n");
+				this.txtResultado.append("WHERE SRVCDG = "+this.txtCuotaFraccionada.getText()+" AND SRVCNS = "+this.txtContratoPartDos.getText()+" AND PRIEST = 0\n");
+				this.txtResultado.append("AND PRICTA = "+this.txtCuotaFraccionada.getText()+" AND PRIFRC = 0\n");
+				this.txtResultado.append("\n");
+				
+				this.txtResultado.append("INSERT INTO CFCPRD/PRITBL\n");
+				this.txtResultado.append("SELECT SRVCDG, SRVCNS, PRICTA, 1, PRIFPA, PRIFPM, PRIFPD,\n");
+				this.txtResultado.append("PRIFDA, PRIFDM, PRIFDD, PRIFHA, PRIFHM, PRIFHD, PRIFCA, PRIFCM,\n");
+				this.txtResultado.append("PRIFCD, PRIFRA, PRIFRM, PRIFRD,  "+this.txtPri1.getText()+", PRIVLP, PRITSR, PRITPG,\n");
+				this.txtResultado.append("10 FROM CFCPRD/PRITBL WHERE SRVCDG = "+this.txtContratoPartUno.getText()+" AND SRVCNS = "+this.txtContratoPartDos.getText()+"\n");
+				this.txtResultado.append("AND PRICTA="+this.txtCuotaFraccionada.getText()+"\n");
+				this.txtResultado.append("\n");
+				
+				this.txtResultado.append("INSERT INTO CFCPRD/PRITBL\n");
+				this.txtResultado.append("SELECT SRVCDG, SRVCNS, PRICTA, 2, PRIFPA, PRIFPM, PRIFPD,\n");
+				this.txtResultado.append("PRIFDA, PRIFDM, PRIFDD, PRIFHA, PRIFHM, PRIFHD, PRIFCA, PRIFCM,\n");
+				this.txtResultado.append("PRIFCD, PRIFRA, PRIFRM, PRIFRD,  "+this.txtPri2.getText()+", PRIVLP, PRITSR, PRITPG,\n");
+				this.txtResultado.append("0 FROM CFCPRD/PRITBL WHERE SRVCDG = "+this.txtContratoPartUno.getText()+" AND SRVCNS = "+this.txtContratoPartDos.getText()+"\n");
+				this.txtResultado.append("AND PRICTA="+this.txtCuotaFraccionada.getText()+" AND PRIFRC=0\n");
+				this.txtResultado.append("\n");
+			}
 		}
 		
 	}
